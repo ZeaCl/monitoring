@@ -1,13 +1,242 @@
-# Empty — reglas de alerta se definen en Fase 6 (#6).
-#
-# Ejemplo de regla:
-# groups:
-#   - name: postgres
-#     rules:
-#       - alert: PostgresTooManyConnections
-#         expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
-#         for: 5m
-#         labels:
-#           severity: warning
-#         annotations:
-#           summary: "Postgres >80% conexiones en {{ $labels.datname }}"
+groups:
+  # ─────────────────────────────────────────────────────────────
+  # Postgres
+  # ─────────────────────────────────────────────────────────────
+  - name: postgres
+    rules:
+      - alert: PostgresTooManyConnections
+        expr: |
+          (sum(pg_stat_database_numbackends) / sum(pg_settings_max_connections)) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Postgres >80% conexiones"
+          description: |
+            {{ $value | humanizePercentage }} del pool de conexiones está en uso
+            ({{ query "sum(pg_stat_database_numbackends)" | first | value }} de
+            {{ query "sum(pg_settings_max_connections)" | first | value }}).
+          runbook_url: "https://github.com/ZeaCl/monitoring#postgres-connections"
+
+      - alert: PostgresConnectionsCritical
+        expr: |
+          (sum(pg_stat_database_numbackends) / sum(pg_settings_max_connections)) > 0.95
+        for: 1m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "Postgres >95% conexiones — CRÍTICO"
+          description: "El pool de Postgres está prácticamente saturado. Nuevas conexiones serán rechazadas."
+
+      - alert: PostgresDeadlocks
+        expr: increase(pg_stat_database_deadlocks[5m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Deadlocks detectados en {{ $labels.datname }}"
+          description: "{{ $value }} deadlock(s) en los últimos 5 minutos en la base {{ $labels.datname }}."
+
+      - alert: PostgresLowCacheHitRatio
+        expr: |
+          (rate(pg_stat_database_blks_hit[10m]) /
+           (rate(pg_stat_database_blks_hit[10m]) + rate(pg_stat_database_blks_read[10m]))) < 0.9
+        for: 15m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Cache hit ratio bajo en {{ $labels.datname }}"
+          description: |
+            {{ $labels.datname }}: {{ $value | humanizePercentage }} cache hit ratio.
+            Revisar buffer cache y queries sin índice.
+
+      - alert: PostgresReplicationLag
+        expr: pg_stat_replication_flush_lag_seconds > 10
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Lag de replicación alto"
+          description: "Replicación con {{ $value }}s de lag en {{ $labels.application_name }}."
+
+  # ─────────────────────────────────────────────────────────────
+  # Redis
+  # ─────────────────────────────────────────────────────────────
+  - name: redis
+    rules:
+      - alert: RedisOutOfMemory
+        expr: |
+          (redis_memory_used_bytes / redis_memory_max_bytes) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Redis >90% memoria"
+          description: |
+            {{ $value | humanizePercentage }} de la memoria Redis en uso.
+            {{ query "redis_memory_used_bytes" | first | value | humanize1024 }}B de
+            {{ query "redis_memory_max_bytes" | first | value | humanize1024 }}B.
+
+      - alert: RedisMemoryCritical
+        expr: |
+          (redis_memory_used_bytes / redis_memory_max_bytes) > 0.98
+        for: 1m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "Redis a punto de quedarse sin memoria — CRÍTICO"
+          description: "Redis no podrá aceptar escrituras si llega a maxmemory."
+
+      - alert: RedisTooManyConnections
+        expr: redis_connected_clients > 500
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Redis con muchas conexiones (>500)"
+          description: "{{ $value }} clientes conectados a Redis. Posible leak de conexiones."
+
+  # ─────────────────────────────────────────────────────────────
+  # Service Uptime
+  # ─────────────────────────────────────────────────────────────
+  - name: services
+    rules:
+      - alert: ServiceDown
+        expr: up{job!~"prometheus"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "{{ $labels.job }} está CAÍDO"
+          description: "El servicio {{ $labels.job }} ({{ $labels.instance }}) no responde desde hace >1 minuto."
+          runbook_url: "https://github.com/ZeaCl/monitoring#service-down"
+
+      - alert: ServiceFlapping
+        expr: rate(up{job!~"prometheus"}[5m]) * 300 < 240
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "{{ $labels.job }} está flapeando"
+          description: "{{ $labels.job }} tuvo reinicios en los últimos 5 minutos. Revisar crash loops."
+
+      - alert: HighErrorRate
+        expr: |
+          rate(http_requests_total{status=~"5.."}[5m]) /
+          rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Tasa de error >5% en {{ $labels.job }}"
+          description: |
+            {{ $labels.job }}: {{ $value | humanizePercentage }} errores 5xx.
+            Revisar logs y dependencias (DB, Redis, APIs externas).
+
+      - alert: HighErrorRateCritical
+        expr: |
+          rate(http_requests_total{status=~"5.."}[5m]) /
+          rate(http_requests_total[5m]) > 0.20
+        for: 3m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Tasa de error >20% en {{ $labels.job }} — CRÍTICO"
+          description: "1 de cada 5 requests está fallando en {{ $labels.job }}."
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Latencia p95 >5s en {{ $labels.job }}"
+          description: "{{ $labels.job }}: p95 = {{ $value }}s. Revisar queries lentas, Ecto N+1, o dependencias externas."
+
+  # ─────────────────────────────────────────────────────────────
+  # EDA / Proyecciones
+  # ─────────────────────────────────────────────────────────────
+  - name: eda
+    rules:
+      - alert: EDALagHigh
+        expr: eda_projection_lag_seconds > 300
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Lag de proyección >5min en {{ $labels.job }}"
+          description: |
+            {{ $labels.job }}/{{ $labels.projection }}: {{ $value }}s de lag.
+            La proyección está atrasada. Revisar consumer de Redis streams.
+
+      - alert: EDALagCritical
+        expr: eda_projection_lag_seconds > 1800
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Lag de proyección >30min — CRÍTICO"
+          description: "{{ $labels.projection }} está prácticamente detenida en {{ $labels.job }}."
+
+      - alert: EDAEventsBacklog
+        expr: redis_stream_pending_messages > 1000
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Backlog de eventos EDA en {{ $labels.job }}"
+          description: |
+            {{ $labels.stream }}/{{ $labels.consumer_group }}: {{ $value }} mensajes pendientes.
+            El consumer no está procesando al ritmo necesario.
+
+      - alert: ObanQueueBacklog
+        expr: oban_queue_length > 500
+        for: 15m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Cola Oban acumulada en {{ $labels.job }}"
+          description: "{{ $labels.queue }}: {{ $value }} jobs pendientes en {{ $labels.job }}."
+
+  # ─────────────────────────────────────────────────────────────
+  # BEAM / Elixir
+  # ─────────────────────────────────────────────────────────────
+  - name: elixir
+    rules:
+      - alert: HighMemoryUsage
+        expr: beam_memory_used_bytes > 1e9
+        for: 15m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Alto uso de memoria BEAM en {{ $labels.job }}"
+          description: "{{ $labels.job }}: {{ $value | humanize1024 }}B. Posible memory leak."
+
+      - alert: ProcessCountHigh
+        expr: beam_process_count > 100000
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Muchos procesos Erlang en {{ $labels.job }}"
+          description: "{{ $labels.job }}: {{ $value }} procesos. Posible process leak."

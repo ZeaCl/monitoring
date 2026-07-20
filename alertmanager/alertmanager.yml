@@ -1,0 +1,33 @@
+route:
+  receiver: "default"
+  group_by: ["alertname", "severity"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+  routes:
+    - match:
+        severity: critical
+      receiver: "critical"
+      repeat_interval: 1h
+
+    - match:
+        severity: warning
+      receiver: "default"
+
+receivers:
+  - name: "default"
+    slack_configs: []
+    # TODO: configurar Slack/email cuando tengamos webhook
+    # slack_configs:
+    #   - channel: "#zea-alerts"
+    #     api_url: ${SLACK_WEBHOOK_URL}
+    #     title: "[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}"
+    #     text: "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}"
+
+  - name: "critical"
+    slack_configs: []
+    # TODO: apunta a canal específico de on-call
+    # slack_configs:
+    #   - channel: "#zea-oncall"
+    #     api_url: ${SLACK_CRITICAL_WEBHOOK_URL}
