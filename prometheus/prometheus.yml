@@ -32,9 +32,9 @@ scrape_configs:
   # Puertos según docker-compose.local.yml / prod.
   # Descomentar cuando los servicios estén en la misma red docker.
 
-  # - job_name: "fm_funds"
-  #   static_configs:
-  #     - targets: ["fm_funds:4082"]
+  - job_name: "fm_funds"
+    static_configs:
+      - targets: ["fm_funds:4082"]
 
   # - job_name: "fm_payments"
   #   static_configs:
