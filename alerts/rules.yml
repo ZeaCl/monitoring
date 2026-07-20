@@ -1,0 +1,13 @@
+# Empty — reglas de alerta se definen en Fase 6 (#6).
+#
+# Ejemplo de regla:
+# groups:
+#   - name: postgres
+#     rules:
+#       - alert: PostgresTooManyConnections
+#         expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+#         for: 5m
+#         labels:
+#           severity: warning
+#         annotations:
+#           summary: "Postgres >80% conexiones en {{ $labels.datname }}"

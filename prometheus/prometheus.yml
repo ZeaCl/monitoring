@@ -1,0 +1,71 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+      # TODO: agregar cuando tengamos alertmanager corriendo
+      # - targets: ["alertmanager:9093"]
+
+rule_files:
+  - "/etc/prometheus/rules.yml"
+  # TODO: descomentar cuando creemos alerts/rules.yml
+  # - "/etc/prometheus/alerts/*.yml"
+
+scrape_configs:
+  # ── Prometheus self-scrape ──────────────────────────────────────
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # ── Postgres exporter ───────────────────────────────────────────
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+
+  # ── Redis exporter ──────────────────────────────────────────────
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+
+  # ── Microservicios FundManagement ───────────────────────────────
+  # Cada uno debe exponer /metrics vía prom_ex en Elixir.
+  #
+  # Descomentar por servicio cuando esté instrumentado y en la misma
+  # red de docker compose.
+
+  # - job_name: "fm_funds"
+  #   static_configs:
+  #     - targets: ["fm_funds:4082"]
+
+  # - job_name: "fm_payments"
+  #   static_configs:
+  #     - targets: ["fm_payments:4085"]
+
+  # - job_name: "fm_investors"
+  #   static_configs:
+  #     - targets: ["fm_investors:4086"]
+
+  # - job_name: "fm_capital_calls"
+  #   static_configs:
+  #     - targets: ["fm_capital_calls:4083"]
+
+  # - job_name: "fm_commitments"
+  #   static_configs:
+  #     - targets: ["fm_commitments:4087"]
+
+  # ── Servicios core ZEA ──────────────────────────────────────────
+  # - job_name: "thalamus"
+  #   static_configs:
+  #     - targets: ["thalamus:4000"]
+
+  # - job_name: "cranium"
+  #   static_configs:
+  #     - targets: ["cranium:4000"]
+
+  # - job_name: "cerebelum"
+  #   static_configs:
+  #     - targets: ["cerebelum:4001"]
