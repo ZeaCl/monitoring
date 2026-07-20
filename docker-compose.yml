@@ -16,6 +16,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - zea
 
   grafana:
     image: grafana/grafana:11.2.0
@@ -33,6 +34,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - zea
     depends_on:
       - prometheus
 
@@ -50,29 +52,32 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - zea
 
   postgres-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter:v0.16.0
     container_name: monitoring-postgres-exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-fundmanagement}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@zea_postgres_local:5432/${POSTGRES_DB:-fundmanagement}?sslmode=disable"
     ports:
       - "9187:9187"
     restart: unless-stopped
     networks:
       - monitoring
+      - zea
 
   redis-exporter:
     image: oliver006/redis_exporter:v1.62.0
     container_name: monitoring-redis-exporter
     environment:
-      REDIS_ADDR: "redis:6379"
+      REDIS_ADDR: "zea_redis_local:6379"
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     ports:
       - "9121:9121"
     restart: unless-stopped
     networks:
       - monitoring
+      - zea
 
 volumes:
   prometheus_data:
@@ -82,3 +87,6 @@ volumes:
 networks:
   monitoring:
     name: monitoring
+  zea:
+    external: true
+    name: zea_zea_network_local
