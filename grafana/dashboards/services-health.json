@@ -16,11 +16,9 @@
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Estado up/down de cada servicio. Verde = healthy, Rojo = caído.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "custom": { "fillOpacity": 80, "lineWidth": 0, "spanNulls": false },
           "mappings": [{ "options": { "0": { "color": "red", "index": 1, "text": "⬇ DOWN" }, "1": { "color": "green", "index": 0, "text": "⬆ UP" } }, "type": "value" }],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
           "unit": "none"
@@ -31,19 +29,16 @@
       "id": 1,
       "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "value_and_name", "wideLayout": true },
       "pluginVersion": "11.2.0",
-      "targets": [
-        { "expr": "up{job=~\"$service\"}", "legendFormat": "{{job}}", "refId": "A" }
-      ],
+      "targets": [{ "expr": "up{job=~\"$service\"}", "legendFormat": "{{job}}", "refId": "A" }],
       "title": "Service Uptime",
       "type": "stat"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Tasa de requests HTTP por segundo por servicio. Indica tráfico en tiempo real.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
           "mappings": [],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
           "unit": "reqps"
@@ -54,22 +49,17 @@
       "id": 2,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        {
-          "expr": "rate(http_requests_total{job=~\"$service\"}[5m])",
-          "legendFormat": "{{job}}",
-          "refId": "A"
-        }
+        { "expr": "rate(prometheus_http_requests_total{job=~\"$service\"}[5m])", "legendFormat": "{{job}}", "refId": "A" }
       ],
       "title": "HTTP Request Rate",
       "type": "timeseries"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Tasa de errores HTTP 4xx y 5xx por servicio. Si >5%, hay problema.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
           "mappings": [],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
           "unit": "reqps"
@@ -80,11 +70,7 @@
       "id": 3,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        {
-          "expr": "rate(http_requests_total{job=~\"$service\", status=~\"4..|5..\"}[5m])",
-          "legendFormat": "{{job}} — {{status}}",
-          "refId": "A"
-        }
+        { "expr": "rate(prometheus_http_requests_total{job=~\"$service\", status=~\"4..|5..\"}[5m])", "legendFormat": "{{job}} — {{status}}", "refId": "A" }
       ],
       "title": "HTTP Errors (4xx/5xx)",
       "type": "timeseries"
@@ -99,91 +85,30 @@
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Latencia p95 de requests HTTP por servicio. Detecta degradación de performance.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 15, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "line", "fillOpacity": 15, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
           "mappings": [],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] },
           "unit": "s"
         },
         "overrides": []
       },
-      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 16 },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 16 },
       "id": 201,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        {
-          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=~\"$service\"}[5m]))",
-          "legendFormat": "{{job}}",
-          "refId": "A"
-        }
+        { "expr": "histogram_quantile(0.50, rate(prometheus_http_request_duration_seconds_bucket{job=~\"$service\"}[5m]))", "legendFormat": "p50 — {{job}}", "refId": "A" },
+        { "expr": "histogram_quantile(0.95, rate(prometheus_http_request_duration_seconds_bucket{job=~\"$service\"}[5m]))", "legendFormat": "p95 — {{job}}", "refId": "B" },
+        { "expr": "histogram_quantile(0.99, rate(prometheus_http_request_duration_seconds_bucket{job=~\"$service\"}[5m]))", "legendFormat": "p99 — {{job}}", "refId": "C" }
       ],
-      "title": "HTTP Latency p95",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Heatmap de latencia: muestra la distribución completa de tiempos de respuesta.",
-      "fieldConfig": {
-        "defaults": { "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "unit": "s" },
-        "overrides": []
-      },
-      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 16 },
-      "id": 202,
-      "options": { "calculate": false, "calculation": {}, "cellGap": 1, "cellValues": {}, "color": { "exponent": 0.5, "fill": "dark-orange", "max": 5, "min": 0, "mode": "scheme", "reverse": false, "scale": "exponential", "scheme": "Spectral", "steps": 64 }, "exemplars": { "color": "rgba(255,0,0,0.7)" }, "filterValues": { "le": 1e-9 }, "legend": { "show": true }, "rowsFrame": { "layout": "auto" }, "showValue": "never", "tooltip": { "mode": "single", "yHistogram": false }, "yAxis": { "axisPlacement": "left", "reverse": false, "unit": "dtdurations" } },
-      "pluginVersion": "11.2.0",
-      "targets": [
-        {
-          "expr": "sum(rate(http_request_duration_seconds_bucket{job=~\"$service\"}[5m])) by (le)",
-          "format": "heatmap",
-          "legendFormat": "{{le}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Latency Heatmap",
-      "type": "heatmap"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Latencia p50 / p95 / p99 comparada por servicio. Visualización rápida de outliers.",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 25, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
-          "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 25 },
-      "id": 203,
-      "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{job=~\"$service\"}[5m]))",
-          "legendFormat": "p50 — {{job}}",
-          "refId": "A"
-        },
-        {
-          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=~\"$service\"}[5m]))",
-          "legendFormat": "p95 — {{job}}",
-          "refId": "B"
-        },
-        {
-          "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job=~\"$service\"}[5m]))",
-          "legendFormat": "p99 — {{job}}",
-          "refId": "C"
-        }
-      ],
-      "title": "Latency Percentiles (p50 / p95 / p99)",
+      "title": "HTTP Latency p50 / p95 / p99",
       "type": "timeseries"
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 33 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
       "id": 300,
       "panels": [],
       "title": "🖥️ BEAM / OTP — Memory & Processes",
@@ -191,172 +116,87 @@
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Memoria usada por la BEAM VM en cada servicio Elixir. Detecta memory leaks.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
           "mappings": [],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
           "unit": "bytes"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 34 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
       "id": 301,
       "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        {
-          "expr": "beam_memory_used_bytes{job=~\"$service\"}",
-          "legendFormat": "{{job}}",
-          "refId": "A"
-        }
+        { "expr": "fm_funds_prom_ex_beam_memory_allocated_bytes{job=~\"$service\"}", "legendFormat": "{{job}}", "refId": "A" }
       ],
       "title": "BEAM Memory Usage",
       "type": "timeseries"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Número de procesos Erlang por servicio. Crecimiento sin control indica leaks de procesos.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 15, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "line", "fillOpacity": 15, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
           "mappings": [],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 34 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
       "id": 302,
       "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        {
-          "expr": "beam_process_count{job=~\"$service\"}",
-          "legendFormat": "{{job}}",
-          "refId": "A"
-        }
+        { "expr": "fm_funds_prom_ex_beam_stats_process_count{job=~\"$service\"}", "legendFormat": "{{job}}", "refId": "A" }
       ],
       "title": "BEAM Process Count",
       "type": "timeseries"
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 42 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
       "id": 400,
-      "panels": [],
-      "title": "🗄️ Ecto — Database Queries",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Tasa de queries Ecto por servicio. Muestra qué servicios más pegan a la DB.",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
-          "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
-          "unit": "ops"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 43 },
-      "id": 401,
-      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
-      "targets": [
-        {
-          "expr": "rate(ecto_query_total{job=~\"$service\"}[5m])",
-          "legendFormat": "{{job}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Ecto Query Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Latencia p95 de queries Ecto por servicio. Detecta N+1 y queries lentas.",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 15, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
-          "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.1 }, { "color": "red", "value": 1 }] },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 43 },
-      "id": 402,
-      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, rate(ecto_query_duration_seconds_bucket{job=~\"$service\"}[5m]))",
-          "legendFormat": "{{job}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Ecto Query Latency p95",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 51 },
-      "id": 500,
       "panels": [],
       "title": "📋 Error Breakdown",
       "type": "row"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Distribución de códigos de estado HTTP por servicio. Permite identificar si los errores son 4xx (cliente) o 5xx (servidor).",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "normal" }, "thresholdsStyle": { "mode": "off" } },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "normal" }, "thresholdsStyle": { "mode": "off" } },
           "mappings": [],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
           "unit": "reqps"
         },
         "overrides": [
           { "matcher": { "id": "byName", "options": "2xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "3xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] },
           { "matcher": { "id": "byName", "options": "4xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
           { "matcher": { "id": "byName", "options": "5xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
         ]
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 52 },
-      "id": 501,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 35 },
+      "id": 401,
       "options": { "legend": { "calcs": ["mean"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        {
-          "expr": "rate(http_requests_total{job=~\"$service\", status=~\"2..\"}[5m])",
-          "legendFormat": "2xx — {{job}}",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(http_requests_total{job=~\"$service\", status=~\"4..\"}[5m])",
-          "legendFormat": "4xx — {{job}}",
-          "refId": "B"
-        },
-        {
-          "expr": "rate(http_requests_total{job=~\"$service\", status=~\"5..\"}[5m])",
-          "legendFormat": "5xx — {{job}}",
-          "refId": "C"
-        }
+        { "expr": "rate(prometheus_http_requests_total{job=~\"$service\", status=~\"2..\"}[5m])", "legendFormat": "2xx — {{job}}", "refId": "A" },
+        { "expr": "rate(prometheus_http_requests_total{job=~\"$service\", status=~\"4..\"}[5m])", "legendFormat": "4xx — {{job}}", "refId": "B" },
+        { "expr": "rate(prometheus_http_requests_total{job=~\"$service\", status=~\"5..\"}[5m])", "legendFormat": "5xx — {{job}}", "refId": "C" }
       ],
       "title": "HTTP Status Codes",
       "type": "timeseries"
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "description": "Porcentaje de requests que resultan en 5xx. Umbrales: verde <1%, amarillo <5%, rojo ≥5%.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "scheme", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "line+area" } },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "line", "fillOpacity": 30, "gradientMode": "scheme", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "line+area" } },
           "mappings": [],
           "max": 100,
           "min": 0,
@@ -365,15 +205,11 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 52 },
-      "id": 502,
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 35 },
+      "id": 402,
       "options": { "legend": { "calcs": ["mean", "last"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        {
-          "expr": "100 * rate(http_requests_total{job=~\"$service\", status=~\"5..\"}[5m]) / rate(http_requests_total{job=~\"$service\"}[5m])",
-          "legendFormat": "{{job}}",
-          "refId": "A"
-        }
+        { "expr": "100 * rate(prometheus_http_requests_total{job=~\"$service\", status=~\"5..\"}[5m]) / rate(prometheus_http_requests_total{job=~\"$service\"}[5m])", "legendFormat": "{{job}}", "refId": "A" }
       ],
       "title": "5xx Error Rate (%)",
       "type": "timeseries"
@@ -385,13 +221,13 @@
   "templating": {
     "list": [
       {
-        "current": { "selected": false, "text": "All", "value": "$__all" },
+        "current": { "selected": true, "text": "fm_funds", "value": "fm_funds" },
         "datasource": { "type": "prometheus", "uid": "prometheus" },
         "definition": "label_values(up, job)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "Service",
-        "multi": true,
+        "multi": false,
         "name": "service",
         "options": [],
         "query": { "qryType": 1, "query": "label_values(up, job)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
@@ -408,6 +244,6 @@
   "timezone": "browser",
   "title": "🏥 Services Health — Uptime, Latencia & Errores",
   "uid": "services-health",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
