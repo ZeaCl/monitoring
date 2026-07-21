@@ -45,6 +45,7 @@ services:
       GF_AUTH_GENERIC_OAUTH_SKIP_ORG_ROLE_SYNC: "false"
       GF_AUTH_DISABLE_LOGIN_FORM: "false"
       GF_USERS_AUTO_ASSIGN_ORG: "true"
+      GF_USERS_AUTO_ASSIGN_ORG_ID: "1"
       GF_USERS_AUTO_ASSIGN_ORG_ROLE: Admin
     ports:
       - "3000:3000"
