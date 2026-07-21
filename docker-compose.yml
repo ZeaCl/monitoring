@@ -122,11 +122,39 @@ services:
     networks:
       - monitoring
 
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: monitoring-tempo
+    volumes:
+      - ./tempo/tempo-config.yml:/etc/tempo/tempo-config.yml:ro
+      - tempo_data:/var/tempo
+    command: "-config.file=/etc/tempo/tempo-config.yml"
+    ports:
+      - "3200:3200"
+      - "9095:9095"
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.110.0
+    container_name: monitoring-otel-collector
+    volumes:
+      - ./tempo/otel-collector-config.yml:/etc/otelcol/config.yml:ro
+    command: "--config=/etc/otelcol/config.yml"
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    restart: unless-stopped
+    networks:
+      - monitoring
+
 volumes:
   prometheus_data:
   grafana_data:
   alertmanager_data:
   loki_data:
+  tempo_data:
 
 networks:
   monitoring:
