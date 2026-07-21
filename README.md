@@ -34,11 +34,11 @@ cp .env.example .env
 docker compose up -d
 ```
 
-| Servicio | URL | Default credentials |
+| Servicio | URL local | Default credentials |
 |---|---|---|
-| **Grafana** | http://localhost:3000 | `admin` / `admin` (cambiar en `.env`) |
-| **Prometheus** | http://localhost:9090 | — |
-| **Alertmanager** | http://localhost:9093 | — |
+| **Grafana** | http://monitor.zea.localhost | `admin` / `admin` (cambiar en `.env`) |
+| **Prometheus** | http://prometheus.zea.localhost | — |
+| **Alertmanager** | http://alerts.zea.localhost | — |
 
 ## 📁 Estructura
 
