@@ -148,6 +148,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - zea
 
 volumes:
   prometheus_data:
