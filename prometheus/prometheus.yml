@@ -82,3 +82,19 @@ scrape_configs:
   # - job_name: "nutrisnaps_gateway"
   #   static_configs:
   #     - targets: ["nutrisnaps_gateway:3001"]
+
+  # ── Security ───────────────────────────────────────────────────
+  # Falco — kernel-level threat detection
+  # - job_name: "falco"
+  #   static_configs:
+  #     - targets: ["falco-exporter:9376"]
+
+  # Wazuh — SIEM agent (metrics via wazuh-exporter)
+  # - job_name: "wazuh"
+  #   static_configs:
+  #     - targets: ["wazuh-exporter:9999"]
+
+  # Cilium/Hubble — network observability
+  # - job_name: "cilium"
+  #   static_configs:
+  #     - targets: ["hubble-relay:9966"]
