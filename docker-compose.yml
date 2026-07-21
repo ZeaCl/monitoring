@@ -39,8 +39,13 @@ services:
       GF_AUTH_GENERIC_OAUTH_AUTH_URL: http://auth.zea.localhost/oauth/authorize
       GF_AUTH_GENERIC_OAUTH_TOKEN_URL: http://thalamus:4000/oauth/token
       GF_AUTH_GENERIC_OAUTH_API_URL: http://thalamus:4000/oauth/userinfo
-      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(roles[*], 'admin') && 'Admin' || 'Viewer'"
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(domain_roles[*].role, 'gp_admin') && 'Admin' || contains(domain_roles[*].role, 'admin') && 'Admin' || 'Viewer'"
       GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: "true"
+      GF_AUTH_GENERIC_OAUTH_SKIP_ORG_ROLE_SYNC: "false"
+      GF_AUTH_DISABLE_LOGIN_FORM: "false"
+      GF_USERS_AUTO_ASSIGN_ORG: "true"
+      GF_USERS_AUTO_ASSIGN_ORG_ROLE: Admin
     ports:
       - "3000:3000"
     restart: unless-stopped
