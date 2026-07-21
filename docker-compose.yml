@@ -97,10 +97,36 @@ services:
       - monitoring
       - zea
 
+  loki:
+    image: grafana/loki:3.1.0
+    container_name: monitoring-loki
+    user: "0:0"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki_data:/loki
+    command: "-config.file=/etc/loki/loki-config.yml"
+    ports:
+      - "3100:3100"
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  promtail:
+    image: grafana/promtail:3.1.0
+    container_name: monitoring-promtail
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: "-config.file=/etc/promtail/promtail-config.yml"
+    restart: unless-stopped
+    networks:
+      - monitoring
+
 volumes:
   prometheus_data:
   grafana_data:
   alertmanager_data:
+  loki_data:
 
 networks:
   monitoring:
