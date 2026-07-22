@@ -240,3 +240,51 @@ groups:
         annotations:
           summary: "Muchos procesos Erlang en {{ $labels.job }}"
           description: "{{ $labels.job }}: {{ $value }} procesos. Posible process leak."
+
+  # ─────────────────────────────────────────────────────────────
+  # Soma — AgentHub
+  # ─────────────────────────────────────────────────────────────
+  - name: soma
+    rules:
+      - alert: SomaServiceDown
+        expr: up{job="soma"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: ai
+        annotations:
+          summary: "Soma AgentHub está caído"
+          description: "El servicio no responde en soma:4084/metrics. Agentes no disponibles."
+          runbook_url: "https://github.com/ZeaCl/soma#troubleshooting"
+
+      - alert: SomaHighErrorRate
+        expr: |
+          rate(soma_agent_errors_total[5m]) / rate(soma_agent_requests_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: ai
+        annotations:
+          summary: "Tasa de error de agentes >10%"
+          description: "{{ $value | humanizePercentage }} de errores en los últimos 5 minutos."
+
+      - alert: SomaAgentResponseLatencyHigh
+        expr: |
+          histogram_quantile(0.95, rate(soma_agent_response_duration_milliseconds_bucket[5m])) > 30000
+        for: 5m
+        labels:
+          severity: warning
+          team: ai
+        annotations:
+          summary: "Latencia p95 de agentes >30s"
+          description: "p95: {{ $value }}ms. Posible degradación del modelo o del engine."
+
+      - alert: SomaNoActiveAgents
+        expr: soma_agent_sessions_total == 0
+        for: 10m
+        labels:
+          severity: warning
+          team: ai
+        annotations:
+          summary: "Sin sesiones de agentes"
+          description: "No se ha iniciado ninguna sesión de agente. Verificar que los agentes estén configurados."

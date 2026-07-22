@@ -66,9 +66,9 @@ scrape_configs:
   #     - targets: ["cerebelum:4001"]
 
   # ── AI / Agentes ────────────────────────────────────────────────
-  # - job_name: "soma"
-  #   static_configs:
-  #     - targets: ["soma:4084"]
+  - job_name: "soma"
+    static_configs:
+      - targets: ["soma:4084"]
 
   # - job_name: "cortex"
   #   static_configs:
