@@ -61,9 +61,9 @@ scrape_configs:
   #   static_configs:
   #     - targets: ["cranium:4000"]
 
-  # - job_name: "cerebelum"
-  #   static_configs:
-  #     - targets: ["cerebelum:4001"]
+  - job_name: "cerebelum"
+    static_configs:
+      - targets: ["cerebelum:4021"]
 
   # ── AI / Agentes ────────────────────────────────────────────────
   - job_name: "soma"

@@ -242,6 +242,45 @@ groups:
           description: "{{ $labels.job }}: {{ $value }} procesos. Posible process leak."
 
   # ─────────────────────────────────────────────────────────────
+  # Cerebelum — Workflow Engine
+  # ─────────────────────────────────────────────────────────────
+  - name: cerebelum
+    rules:
+      - alert: CerebelumExecutionFailureRate
+        expr: |
+          rate(cerebelum_executions_failed_count[10m]) /
+          rate(cerebelum_executions_started_count[10m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Tasa de fallos de workflows >10% en Cerebelum"
+          description: |
+            {{ $value | humanizePercentage }} de workflows están fallando.
+            Revisar logs de ejecuciones fallidas.
+
+      - alert: CerebelumWorkerPoolExhausted
+        expr: cerebelum_workers_idle_count == 0
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Worker pool de Cerebelum agotado"
+          description: "No hay workers idle disponibles. Las ejecuciones se quedarán esperando."
+
+      - alert: CerebelumHITLBacklog
+        expr: cerebelum_workflows_awaiting_approval_count > 20
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Backlog de aprobaciones HITL en Cerebelum"
+          description: "{{ $value }} workflows esperando aprobación humana. Puede haber un cuello de botella."
+
+  # ─────────────────────────────────────────────────────────────
   # Soma — AgentHub
   # ─────────────────────────────────────────────────────────────
   - name: soma
