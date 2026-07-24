@@ -250,6 +250,7 @@ groups:
         expr: |
           rate(cerebelum_executions_failed_count[10m]) /
           rate(cerebelum_executions_started_count[10m]) > 0.1
+          AND rate(cerebelum_executions_started_count[10m]) > 0
         for: 5m
         labels:
           severity: warning
