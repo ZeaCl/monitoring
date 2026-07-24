@@ -201,7 +201,7 @@
       "id": 231,
       "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "cerebelum_workers_connected_count_total or vector(0)", "legendFormat": "Connected", "refId": "A" }
+        { "expr": "cerebelum_workers_connected_count or vector(0)", "legendFormat": "Connected", "refId": "A" }
       ],
       "title": "Workers Connected",
       "type": "timeseries"
@@ -222,7 +222,7 @@
       "id": 232,
       "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "cerebelum_tasks_queued_count_total or vector(0)", "legendFormat": "Queued Tasks", "refId": "A" }
+        { "expr": "cerebelum_tasks_queued_count or vector(0)", "legendFormat": "Queued Tasks", "refId": "A" }
       ],
       "title": "Tasks Queued",
       "type": "timeseries"

@@ -262,7 +262,7 @@ groups:
             Revisar logs de ejecuciones fallidas.
 
       - alert: CerebelumWorkerPoolExhausted
-        expr: cerebelum_workers_idle_count_total == 0
+        expr: cerebelum_workers_connected_count == 0
         for: 5m
         labels:
           severity: warning
