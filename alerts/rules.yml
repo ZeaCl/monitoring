@@ -248,9 +248,9 @@ groups:
     rules:
       - alert: CerebelumExecutionFailureRate
         expr: |
-          rate(cerebelum_executions_failed_count[10m]) /
-          rate(cerebelum_executions_started_count[10m]) > 0.1
-          AND rate(cerebelum_executions_started_count[10m]) > 0
+          rate(cerebelum_executions_failed_count_total[10m]) /
+          rate(cerebelum_executions_started_count_total[10m]) > 0.1
+          AND rate(cerebelum_executions_started_count_total[10m]) > 0
         for: 5m
         labels:
           severity: warning
@@ -262,7 +262,7 @@ groups:
             Revisar logs de ejecuciones fallidas.
 
       - alert: CerebelumWorkerPoolExhausted
-        expr: cerebelum_workers_idle_count == 0
+        expr: cerebelum_workers_idle_count_total == 0
         for: 5m
         labels:
           severity: warning
@@ -272,7 +272,7 @@ groups:
           description: "No hay workers idle disponibles. Las ejecuciones se quedarán esperando."
 
       - alert: CerebelumHITLBacklog
-        expr: cerebelum_workflows_awaiting_approval_count > 20
+        expr: cerebelum_workflows_approval_entered_count_total - cerebelum_workflows_approval_exited_count_total > 20
         for: 10m
         labels:
           severity: warning

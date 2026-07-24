@@ -30,8 +30,8 @@
       "id": 201,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "rate(cerebelum_executions_started_count[5m])", "legendFormat": "Started", "refId": "A" },
-        { "expr": "rate(cerebelum_executions_completed_count[5m])", "legendFormat": "Completed", "refId": "B" }
+        { "expr": "rate(cerebelum_executions_started_count_total[5m])", "legendFormat": "Started", "refId": "A" },
+        { "expr": "rate(cerebelum_executions_completed_count_total[5m])", "legendFormat": "Completed", "refId": "B" }
       ],
       "title": "Workflow Throughput",
       "type": "timeseries"
@@ -52,7 +52,7 @@
       "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto", "wideLayout": true },
       "pluginVersion": "11.2.0",
       "targets": [
-        { "expr": "rate(cerebelum_executions_failed_count[10m]) / rate(cerebelum_executions_started_count[10m])", "legendFormat": "Failure Rate", "refId": "A" }
+        { "expr": "rate(cerebelum_executions_failed_count_total[10m]) / rate(cerebelum_executions_started_count_total[10m])", "legendFormat": "Failure Rate", "refId": "A" }
       ],
       "title": "Execution Failure Rate",
       "type": "stat"
@@ -72,7 +72,7 @@
       "id": 203,
       "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto", "wideLayout": true },
       "targets": [
-        { "expr": "rate(cerebelum_executions_completed_count[1h]) * 3600", "legendFormat": "Workflows/hour", "refId": "A" }
+        { "expr": "rate(cerebelum_executions_completed_count_total[1h]) * 3600", "legendFormat": "Workflows/hour", "refId": "A" }
       ],
       "title": "Workflows / hour",
       "type": "stat"
@@ -101,8 +101,8 @@
       "id": 211,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "rate(cerebelum_steps_executed_count[5m])", "legendFormat": "Executed", "refId": "A" },
-        { "expr": "rate(cerebelum_steps_failed_count[5m])", "legendFormat": "Failed", "refId": "B" }
+        { "expr": "rate(cerebelum_steps_executed_count_total[5m])", "legendFormat": "Executed", "refId": "A" },
+        { "expr": "rate(cerebelum_steps_failed_count_total[5m])", "legendFormat": "Failed", "refId": "B" }
       ],
       "title": "Step Throughput",
       "type": "timeseries"
@@ -122,7 +122,7 @@
       "id": 212,
       "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto", "wideLayout": true },
       "targets": [
-        { "expr": "rate(cerebelum_steps_failed_count[10m]) / rate(cerebelum_steps_executed_count[10m])", "legendFormat": "Step Error Rate", "refId": "A" }
+        { "expr": "rate(cerebelum_steps_failed_count_total[10m]) / rate(cerebelum_steps_executed_count_total[10m])", "legendFormat": "Step Error Rate", "refId": "A" }
       ],
       "title": "Step Error Rate",
       "type": "stat"
@@ -151,7 +151,7 @@
       "id": 221,
       "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "cerebelum_workflows_sleeping_count or vector(0)", "legendFormat": "Sleeping", "refId": "A" }
+        { "expr": "cerebelum_workflows_sleep_entered_count_total - cerebelum_workflows_sleep_exited_count_total or vector(0)", "legendFormat": "Sleeping", "refId": "A" }
       ],
       "title": "Workflows Sleeping",
       "type": "timeseries"
@@ -172,7 +172,7 @@
       "id": 222,
       "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "cerebelum_workflows_awaiting_approval_count or vector(0)", "legendFormat": "Awaiting Approval", "refId": "A" }
+        { "expr": "cerebelum_workflows_approval_entered_count_total - cerebelum_workflows_approval_exited_count_total or vector(0)", "legendFormat": "Awaiting Approval", "refId": "A" }
       ],
       "title": "Workflows Awaiting Approval (HITL)",
       "type": "timeseries"
@@ -201,7 +201,7 @@
       "id": 231,
       "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "cerebelum_workers_connected_count or vector(0)", "legendFormat": "Connected", "refId": "A" }
+        { "expr": "cerebelum_workers_connected_count_total or vector(0)", "legendFormat": "Connected", "refId": "A" }
       ],
       "title": "Workers Connected",
       "type": "timeseries"
@@ -222,7 +222,7 @@
       "id": 232,
       "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "cerebelum_tasks_queued_count or vector(0)", "legendFormat": "Queued Tasks", "refId": "A" }
+        { "expr": "cerebelum_tasks_queued_count_total or vector(0)", "legendFormat": "Queued Tasks", "refId": "A" }
       ],
       "title": "Tasks Queued",
       "type": "timeseries"
@@ -251,7 +251,7 @@
       "id": 241,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "rate(cerebelum_blueprints_deployed_count[1h])", "legendFormat": "Deployed", "refId": "A" }
+        { "expr": "rate(cerebelum_blueprints_deployed_count_total[1h])", "legendFormat": "Deployed", "refId": "A" }
       ],
       "title": "Blueprint Deploys",
       "type": "timeseries"
@@ -272,8 +272,8 @@
       "id": 242,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "rate(cerebelum_blueprints_steps_updated_count[1h])", "legendFormat": "Steps Updated", "refId": "A" },
-        { "expr": "rate(cerebelum_blueprints_steps_deleted_count[1h])", "legendFormat": "Steps Deleted", "refId": "B" }
+        { "expr": "rate(cerebelum_blueprints_steps_updated_count_total[1h])", "legendFormat": "Steps Updated", "refId": "A" },
+        { "expr": "rate(cerebelum_blueprints_steps_deleted_count_total[1h])", "legendFormat": "Steps Deleted", "refId": "B" }
       ],
       "title": "Step CRUD Activity",
       "type": "timeseries"
